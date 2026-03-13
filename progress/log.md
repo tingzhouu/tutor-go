@@ -36,6 +36,29 @@ After each session, add an entry below. The tutor will read this at the start of
 
 (Start logging below this line)
 
+### Day 6 — 2026-03-13
+**Week**: 2 | **Topic**: Arrays, slices, and maps
+**Session type**: Compare & contrast + exercise
+**What we did**:
+- Predicted output of 4 snippets covering: array copy vs slice reference, sub-slice mutation, map zero values with comma-ok idiom
+- Implemented `cartTotal(items map[string]int) int` — Go equivalent of `Object.values().reduce()`
+- Initialized Go module (`go mod init`)
+
+**What clicked**:
+- Arrays are value types (copy on assign), slices are reference types — got all predictions right
+- Sub-slices share underlying array — predicted the mutation correctly
+- Comma-ok idiom for map lookups — predicted `0, false` for missing key
+- `make(map[...])` requirement for map initialization
+
+**What needs reinforcement**:
+- Idiomatic `for _, value := range map` — used `for key := range` + manual lookup instead (works but extra step)
+
+**Code written**: exercises/week-02/day06_collections.go
+
+**Tutor notes**: Perfect 4/4 on predictions — the value-vs-reference distinction clicked immediately (likely from JS experience with objects vs primitives). cartTotal implementation was correct, just not yet using the two-variable range form. Quick session, strong start to Week 2. Next: Day 7 (loops & range, data transformation).
+
+---
+
 ### Day 5 — 2026-03-12
 **Week**: 1 | **Topic**: Review — read 3 Go snippets, predict output
 **Session type**: Quiz + review
