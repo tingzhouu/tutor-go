@@ -36,6 +36,30 @@ After each session, add an entry below. The tutor will read this at the start of
 
 (Start logging below this line)
 
+### Day 7 — 2026-03-14
+**Week**: 2 | **Topic**: Loops & range — data transformations
+**Session type**: Guided exercise
+**What we did**:
+- Covered all forms of `for`: classic, while-style, infinite, range over slice, range over map
+- Implemented `filterAbove`, `applyTax`, `cartTotal` — Go equivalents of `.filter()`, `.map()`, `.reduce()`
+- Chained all three together for a realistic pipeline
+- Reorganized week-02 exercises into per-day subdirectories to fix `main redeclared` conflict
+
+**What clicked**:
+- `for _, value := range` — used correctly this time (improvement from day 6)
+- Building new slices with `append` for filter/map patterns
+- Function composition as Go's alternative to method chaining
+- Integer math for currency (`price * 110 / 100`)
+
+**What needs reinforcement**:
+- No issues today — all three functions written correctly on first attempt
+
+**Code written**: exercises/week-02/day07/main.go
+
+**Tutor notes**: All exercises done independently, clean code, correct results. Used idiomatic two-variable range throughout. Good understanding that Go has no built-in filter/map — explicit loops are the Go way. Ready for Day 8 (pointers).
+
+---
+
 ### Day 6 — 2026-03-13
 **Week**: 2 | **Topic**: Arrays, slices, and maps
 **Session type**: Compare & contrast + exercise
