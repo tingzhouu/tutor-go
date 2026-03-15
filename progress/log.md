@@ -36,6 +36,29 @@ After each session, add an entry below. The tutor will read this at the start of
 
 (Start logging below this line)
 
+### Day 8 — 2026-03-15
+**Week**: 2 | **Topic**: Pointers — pass by value vs reference, pointer receivers
+**Session type**: Compare & contrast + exercise
+**What we did**:
+- Predicted output of 5 snippets covering: struct copy, pointer dereference, value vs pointer function params, value vs pointer method receivers
+- Implemented `Refund()` method on `*Order` — pointer receiver with guard clause and formatted output
+- Discussed `fmt.Printf` vs `Sprintf` vs `Println` — when to use each
+
+**What clicked**:
+- Pass-by-value for structs (copy on assign) — predicted all 5 correctly
+- `&` and `*` syntax — address-of and dereference
+- Pointer receivers for methods that need to mutate
+- Guard clause pattern with early return (no exceptions in Go)
+
+**What needs reinforcement**:
+- Read exercise specs more carefully — initially guarded on wrong condition (minor)
+
+**Code written**: exercises/week-02/day08/main.go
+
+**Tutor notes**: 5/5 predictions correct — pointers clicked immediately, which is unusual for someone coming from JS. Likely helped by the clear value-vs-reference framing from slices (Day 6). Refund implementation was clean after one adjustment. Ready for Day 9 (packages & visibility).
+
+---
+
 ### Day 7 — 2026-03-14
 **Week**: 2 | **Topic**: Loops & range — data transformations
 **Session type**: Guided exercise
