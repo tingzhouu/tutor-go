@@ -36,6 +36,55 @@ After each session, add an entry below. The tutor will read this at the start of
 
 (Start logging below this line)
 
+### Day 10 — 2026-03-16
+**Week**: 2 | **Topic**: Review — debug 3 programs + deep dive on `make`
+**Session type**: Code review + guided exercise
+**What we did**:
+- Found and fixed 3 bugs: value receiver (pointer needed), appending to iterated slice (infinite loop), nil map write (panic)
+- Deep dive on `make` — when and why it's needed for maps, slices, channels
+- Practiced `make` with size hints, `len` vs `cap`, nil map reads vs writes
+- Built a `frequency` counter function
+
+**What clicked**:
+- All 3 debug bugs found and fixed correctly
+- `make` demystified — just initializes internals for maps/slices/channels
+- Map literal `map[K]V{}` as alternative to `make(map[K]V)`
+- Writing to nil map panics, but reading returns zero value safely
+
+**What was tricky**:
+- Predicted nil map read would panic — actually returns zero value (only writes panic)
+- Predicted `make([]int, 3)` + append gives `[99]` — actually `[0 0 0 99]` (make with length pre-fills zeros)
+- Used `+= 1` instead of `++` (works but less idiomatic)
+
+**Code written**: exercises/week-02/day10/main.go, exercises/week-02/day10-make/main.go
+
+**Tutor notes**: Debug exercise 3/3 correct. The `make` deep dive was valuable — exposed two misconceptions about nil maps and make's length parameter. Both are common Go gotchas. Week 2 complete. Ready for Week 3 (CLI tool project).
+
+---
+
+### Day 9 — 2026-03-16
+**Week**: 2 | **Topic**: Packages & visibility
+**Session type**: Exercise — fix visibility + extract package
+**What we did**:
+- Extracted `Payment`/`Order` types into a `payments` package
+- Fixed exported vs unexported visibility on struct, fields, constructor, methods
+- Implemented `Refund()` with pointer receiver in the package context
+- Learned `NewXxx()` constructor convention
+
+**What clicked**:
+- Uppercase = exported, lowercase = unexported — simple rule
+- Package = directory in Go
+- Constructor convention `NewOrder()` (no `new` keyword like JS)
+
+**What needs reinforcement**:
+- Missing `return` after guard clause (same issue as Day 8) — pattern to watch for
+
+**Code written**: exercises/week-02/day09/payments/order.go, exercises/week-02/day09/main.go
+
+**Tutor notes**: Visibility fixes done correctly. Initially kept fields unexported, then exported them after feedback. Guard clause `return` missed again — worth building muscle memory on this pattern. Strong understanding of package structure.
+
+---
+
 ### Day 8 — 2026-03-15
 **Week**: 2 | **Topic**: Pointers — pass by value vs reference, pointer receivers
 **Session type**: Compare & contrast + exercise
