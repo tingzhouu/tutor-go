@@ -36,6 +36,33 @@ After each session, add an entry below. The tutor will read this at the start of
 
 (Start logging below this line)
 
+### Day 11 — 2026-03-17
+**Week**: 3 | **Topic**: CLI project setup — flag parsing, subcommands
+**Session type**: Pair programming
+**What we did**:
+- Started webhook-logger CLI project with subcommands (log, list, summary)
+- Learned `flag.NewFlagSet` for subcommand flag parsing
+- Implemented `handleLog` with `--type`, `--amount`, `--id` flags and validation
+- Implemented `handleList` with optional `--type` filter
+- Deep dive on stdout vs stderr — why errors go to stderr (pipe safety)
+- Discussed `os.Stdin` vs `os.Stdout` vs `os.Stderr` and Go's permissive `io.Writer` interface
+
+**What clicked**:
+- Flag parsing with pointers (`&eventType`) — connected to Day 8 pointer knowledge
+- Validation pattern: check defaults after parse, print to stderr, exit
+- stdout vs stderr distinction and why it matters for piping
+
+**What was new/surprising**:
+- `os.Stdin` accepts writes because it satisfies `io.Writer` — Go won't stop you
+- stderr bypasses pipes — errors always reach the terminal
+- `flag` has no built-in "required" concept — you validate manually
+
+**Code written**: projects/webhook-logger/main.go
+
+**Tutor notes**: Good session with lots of conceptual questions — learner wanted to understand *why*, not just *how*. The stdout/stderr discussion was valuable. Flag parsing clicked once the pointer connection was made. Ready for Day 12 (file I/O — persisting events to JSON).
+
+---
+
 ### Day 10 — 2026-03-16
 **Week**: 2 | **Topic**: Review — debug 3 programs + deep dive on `make`
 **Session type**: Code review + guided exercise
