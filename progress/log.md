@@ -36,6 +36,30 @@ After each session, add an entry below. The tutor will read this at the start of
 
 (Start logging below this line)
 
+### Day 13 — 2026-03-19
+**Week**: 3 | **Topic**: Error handling — return errors, wrapping with %w
+**Session type**: Guided exercise + refactor
+**What we did**:
+- Fixed missing `\n` in format strings and replaced `return` with `os.Exit(1)` for proper exit codes
+- Refactored `handleLog` and `handleList` to return `error` instead of calling `os.Exit(1)` directly
+- Moved error printing and exit logic to `main` — single responsibility
+- Learned error wrapping with `%w` vs `%s`, `errors.Is`, `errors.As`
+- Discussed why wrapping preserves the error chain for callers to inspect
+
+**What clicked**:
+- Error wrapping with `%w` — understood the difference from `%s` (preserves the original error vs flattening to string)
+- Return-error pattern — handlers return errors, `main` decides how to exit
+
+**What needs reinforcement**:
+- `./` prefix for running local packages (came up again)
+- CLI argument ordering — subcommand before flags (tripped up a few times)
+
+**Code written**: projects/webhook-logger/main.go (refactored)
+
+**Tutor notes**: Error wrapping concept landed well — good questions about how callers access wrapped errors. Learner expressed wanting more from-scratch coding; consider giving `handleSummary` as an unguided exercise next session. The `go run` invocation patterns (package path, subcommand ordering) keep tripping up — worth a quick cheat sheet. Ready for Day 14 (tests or summary implementation).
+
+---
+
 ### Day 12 — 2026-03-18
 **Week**: 3 | **Topic**: File I/O — persisting events to JSON
 **Session type**: Pair programming

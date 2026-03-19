@@ -36,9 +36,15 @@ func main() {
 
 	switch os.Args[1] {
 	case "log":
-		handleLog(os.Args[2:])
+		if err := handleLog(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "error %s\n", err)
+			os.Exit(1)
+		}
 	case "list":
-		handleList(os.Args[2:])
+		if err := handleList(os.Args[2:]); err != nil {
+			fmt.Fprintf(os.Stderr, "error %s\n", err)
+			os.Exit(1)
+		}
 	case "summary":
 		handleSummary()
 	default:
@@ -72,7 +78,7 @@ func printUsage() {
 // TS equivalent of flag parsing:
 //   const { type, amount, id } = yargs(process.argv).option('type', { ... })
 
-func handleLog(args []string) {
+func handleLog(args []string) error {
 	// Your code here
 	fs := flag.NewFlagSet("log", flag.ExitOnError)
 	var eventType string
@@ -84,31 +90,26 @@ func handleLog(args []string) {
 	fs.Parse(args)
 
 	if eventType == "" {
-		fmt.Fprintln(os.Stderr, "error: --type is required")
-		fs.Usage() // prints the flag help text
-		os.Exit(1)
+		return fmt.Errorf("--type is required")
 	}
 
 	if amount <= 0 {
-		fmt.Fprintln(os.Stderr, "error: --amount is required and must be positive")
-		fs.Usage() // prints the flag help text
-		os.Exit(1)
+		return fmt.Errorf("--amount is required and must be positive")
 	}
 
 	fmt.Printf("eventType %s, amount %d, id %s\n", eventType, amount, id)
 	events, err := loadEvents()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "encountered err %s\n", err)
-		return
+		return fmt.Errorf("loading events: %w", err)
 	}
 	event := newEvent(id, eventType, amount)
 	events = append(events, event)
 	err = saveEvents(events)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error saving events: %s\n", err)
-		return
+		return fmt.Errorf("error saving events: %w", err)
 	}
-	fmt.Printf("Successfully saved event of id %s", id)
+	fmt.Printf("Successfully saved event of id %s\n", id)
+	return nil
 }
 
 // TODO 2: Implement handleList
@@ -117,7 +118,7 @@ func handleLog(args []string) {
 //
 // For now, just print "Listing events..." and the filter if provided.
 
-func handleList(args []string) {
+func handleList(args []string) error {
 	// Your code here
 	fs := flag.NewFlagSet("list", flag.ExitOnError)
 	var eventType string
@@ -128,8 +129,7 @@ func handleList(args []string) {
 
 	events, err := loadEvents()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "encountered err %s\n", err)
-		return
+		return fmt.Errorf("encountered err: %w", err)
 	}
 	for _, e := range events {
 		if eventType != "" && eventType != e.Type {
@@ -137,6 +137,7 @@ func handleList(args []string) {
 		}
 		fmt.Printf("eventType %s, amount %d, id %s\n", e.Type, e.Amount, e.ID)
 	}
+	return nil
 }
 
 // TODO 3: Implement handleSummary
