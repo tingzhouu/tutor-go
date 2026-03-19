@@ -36,6 +36,34 @@ After each session, add an entry below. The tutor will read this at the start of
 
 (Start logging below this line)
 
+### Day 12 — 2026-03-18
+**Week**: 3 | **Topic**: File I/O — persisting events to JSON
+**Session type**: Pair programming
+**What we did**:
+- Added `event.go` with Event struct, JSON struct tags, loadEvents/saveEvents/newEvent
+- Wired `handleLog` to save events to `events.json` via loadEvents → append → saveEvents
+- Wired `handleList` to load and display events with optional `--type` filter
+- Applied happy-path-on-left with `continue` in the filter loop
+- Learned `json.Marshal`/`Unmarshal`, `os.ReadFile`/`os.WriteFile`, struct tags
+- Discussed why `loadEvents` stays lowercase (same package, no export needed)
+- Learned `./` prefix requirement for running local packages
+
+**What clicked**:
+- JSON struct tags — `json:"field_name"` for controlling serialization
+- Happy path with `continue` in loops — applied without prompting after reminder
+- Multi-file packages — `go run ./dir/` compiles all files together
+- Same-package visibility — no uppercase needed within the package
+
+**What needs reinforcement**:
+- Handle errors from all function calls (missed `saveEvents` error)
+- Add `\n` to error format strings in `Fprintf`
+
+**Code written**: projects/webhook-logger/event.go, projects/webhook-logger/main.go (updated)
+
+**Tutor notes**: Feature implementation was quick and correct. Filter logic initially showed all-or-nothing, then fixed with happy-path `continue`. Two minor issues remain: unhandled `saveEvents` error and missing newlines in error messages. Good conceptual questions about package paths and visibility. Ready for Day 13 (error handling refactor).
+
+---
+
 ### Day 11 — 2026-03-17
 **Week**: 3 | **Topic**: CLI project setup — flag parsing, subcommands
 **Session type**: Pair programming

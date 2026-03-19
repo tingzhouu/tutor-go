@@ -91,11 +91,24 @@ func handleLog(args []string) {
 
 	if amount <= 0 {
 		fmt.Fprintln(os.Stderr, "error: --amount is required and must be positive")
-		fs.Usage()                                                                  // prints the flag help text
+		fs.Usage() // prints the flag help text
 		os.Exit(1)
 	}
 
 	fmt.Printf("eventType %s, amount %d, id %s\n", eventType, amount, id)
+	events, err := loadEvents()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "encountered err %s\n", err)
+		return
+	}
+	event := newEvent(id, eventType, amount)
+	events = append(events, event)
+	err = saveEvents(events)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "error saving events: %s\n", err)
+		return
+	}
+	fmt.Printf("Successfully saved event of id %s", id)
 }
 
 // TODO 2: Implement handleList
@@ -112,6 +125,18 @@ func handleList(args []string) {
 	fs.Parse(args)
 
 	fmt.Printf("Listing events... %s\n", eventType)
+
+	events, err := loadEvents()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "encountered err %s\n", err)
+		return
+	}
+	for _, e := range events {
+		if eventType != "" && eventType != e.Type {
+			continue
+		}
+		fmt.Printf("eventType %s, amount %d, id %s\n", e.Type, e.Amount, e.ID)
+	}
 }
 
 // TODO 3: Implement handleSummary
