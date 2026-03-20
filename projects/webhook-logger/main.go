@@ -98,13 +98,13 @@ func handleLog(args []string) error {
 	}
 
 	fmt.Printf("eventType %s, amount %d, id %s\n", eventType, amount, id)
-	events, err := loadEvents()
+	events, err := loadEvents("events.json")
 	if err != nil {
 		return fmt.Errorf("loading events: %w", err)
 	}
 	event := newEvent(id, eventType, amount)
 	events = append(events, event)
-	err = saveEvents(events)
+	err = saveEvents("events.json", events)
 	if err != nil {
 		return fmt.Errorf("error saving events: %w", err)
 	}
@@ -127,7 +127,7 @@ func handleList(args []string) error {
 
 	fmt.Printf("Listing events... %s\n", eventType)
 
-	events, err := loadEvents()
+	events, err := loadEvents("events.json")
 	if err != nil {
 		return fmt.Errorf("encountered err: %w", err)
 	}

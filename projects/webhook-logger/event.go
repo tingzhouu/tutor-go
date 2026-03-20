@@ -15,12 +15,10 @@ type Event struct {
 	CreatedAt string `json:"created_at"`
 }
 
-const eventsFile = "events.json"
-
 // loadEvents reads all events from the JSON file.
 // Returns an empty slice if the file doesn't exist yet.
-func loadEvents() ([]Event, error) {
-	data, err := os.ReadFile(eventsFile)
+func loadEvents(path string) ([]Event, error) {
+	data, err := os.ReadFile(path)
 	if err != nil {
 		// File doesn't exist yet — that's fine, return empty slice
 		if os.IsNotExist(err) {
@@ -39,12 +37,12 @@ func loadEvents() ([]Event, error) {
 
 // saveEvents writes all events to the JSON file.
 // 0644 = owner can read/write, others can read (standard file permission).
-func saveEvents(events []Event) error {
+func saveEvents(path string, events []Event) error {
 	data, err := json.MarshalIndent(events, "", "  ")
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(eventsFile, data, 0644)
+	return os.WriteFile(path, data, 0644)
 }
 
 // newEvent creates an Event with the current timestamp.
