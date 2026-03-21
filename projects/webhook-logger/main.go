@@ -46,7 +46,10 @@ func main() {
 			os.Exit(1)
 		}
 	case "summary":
-		handleSummary()
+		if err := handleSummary("events.json"); err != nil {
+			fmt.Fprintf(os.Stderr, "error %s\n", err)
+			os.Exit(1)
+		}
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n", os.Args[1])
 		printUsage()
@@ -143,7 +146,25 @@ func handleList(args []string) error {
 // TODO 3: Implement handleSummary
 // No flags needed. Just print "Summary coming soon..." for now.
 
-func handleSummary() {
+func handleSummary(path string) error {
 	// Your code here
-	fmt.Println("summary coming soon...")
+	events, err := loadEvents(path)
+	if err != nil {
+		return fmt.Errorf("Unexpected error when loading events: %w", err)
+	}
+
+	eventAmount := make(map[string]int)
+	eventCount := make(map[string]int)
+	totalAmount := 0
+	for _, event := range events {
+		eventAmount[event.Type] += event.Amount
+		eventCount[event.Type]++
+		totalAmount += event.Amount
+	}
+
+	for eventType, amount := range eventAmount {
+		fmt.Printf("%s\t%d\tevents\t$%.2f\n", eventType, eventCount[eventType], float64(amount)/100)
+	}
+	fmt.Printf("Total %d events\t$%.2f\n", len(events), float64(totalAmount)/100)
+	return nil
 }

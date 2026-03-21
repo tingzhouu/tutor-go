@@ -1,6 +1,9 @@
 package main
 
 import (
+	"bytes"
+	"os"
+	"strings"
 	"testing"
 )
 
@@ -84,7 +87,6 @@ func TestLoadEventsFileNotFound(t *testing.T) {
 	path := dir + "/events.json"
 
 	loadedEvents, err := loadEvents(path)
-	// loadedEvents, err := loadEvents(path)
 	if err != nil {
 		t.Errorf("expected nil error but got %v", err)
 	}
@@ -92,4 +94,45 @@ func TestLoadEventsFileNotFound(t *testing.T) {
 	if len(loadedEvents) != 0 {
 		t.Errorf("expected loadedEvents to be empty but got %v", loadedEvents)
 	}
+}
+
+func TestSummary(t *testing.T) {
+	mockRawEvents := []struct {
+		Id        string
+		EventType string
+		Amount    int
+	}{
+		{Id: "evt_XXX", EventType: "payment_intent.succeeded", Amount: 4999},
+		{Id: "evt_XXX", EventType: "payment_intent.failed", Amount: 1200},
+		{Id: "evt_XXX", EventType: "event.paymentCreated", Amount: 499},
+	}
+	mockEvents := []Event{}
+	for _, rawEvt := range mockRawEvents {
+		mockEvents = append(mockEvents, newEvent(rawEvt.Id, rawEvt.EventType, rawEvt.Amount))
+	}
+	dir := t.TempDir() + "/events.json"
+	saveEvents(dir, mockEvents)
+
+	output := captureOutput(t, func() {
+		handleSummary(dir)
+	})
+	if !strings.Contains(output, "payment_intent.succeeded") {
+		t.Errorf("expected type in output, got %s", output)
+	}
+
+	t.Log(output)
+}
+
+func captureOutput(t *testing.T, fn func()) string {
+	t.Helper()
+	old := os.Stdout
+	r, w, _ := os.Pipe()
+	os.Stdout = w
+	fn()
+
+	w.Close()
+	os.Stdout = old
+	var buf bytes.Buffer
+	buf.ReadFrom(r)
+	return buf.String()
 }
