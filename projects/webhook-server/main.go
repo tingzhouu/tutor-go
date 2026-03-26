@@ -15,6 +15,10 @@ func main() {
 
 	http.HandleFunc("GET /events", logging(s.handleListEvents))
 
+	http.HandleFunc("DELETE /events/{id}", logging(s.handleDeleteEvent))
+
+	http.HandleFunc("PUT /events/{id}", logging(s.handleUpdateEvent))
+
 	http.ListenAndServe(":8080", nil)
 
 }

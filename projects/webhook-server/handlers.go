@@ -10,6 +10,75 @@ type server struct {
 	eventsPath string
 }
 
+func (s *server) handleUpdateEvent(w http.ResponseWriter, r *http.Request) {
+	var eventUpdate Event
+	eventId := r.PathValue("id")
+	decoder := json.NewDecoder(r.Body)
+
+	if err := decoder.Decode(&eventUpdate); err != nil {
+		http.Error(w, "invalid json", http.StatusBadRequest)
+		return
+	}
+
+	events, err := loadEvents(s.eventsPath)
+	if err != nil {
+		http.Error(w, "failed to load events", http.StatusInternalServerError)
+		return
+	}
+
+	var event *Event
+	for i, existingEvent := range events {
+		if existingEvent.ID == eventId {
+			event = &events[i]
+			break
+		}
+	}
+
+	if event == nil {
+		http.Error(w, "event not found", http.StatusNotFound)
+		return
+	}
+
+	event.Type = eventUpdate.Type
+	event.Amount = eventUpdate.Amount
+
+	err = saveEvents(s.eventsPath, events)
+	if err != nil {
+		http.Error(w, "failed to save events", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(w)
+	encoder.Encode(event)
+}
+
+func (s *server) handleDeleteEvent(w http.ResponseWriter, r *http.Request) {
+	id := r.PathValue("id")
+	events, err := loadEvents(s.eventsPath)
+	if err != nil {
+		http.Error(w, "failed to load events", http.StatusInternalServerError)
+		return
+	}
+	eventResult := make([]Event, 0)
+	for _, e := range events {
+		if e.ID != id {
+			eventResult = append(eventResult, e)
+		}
+	}
+
+	if len(events) == len(eventResult) {
+		http.Error(w, "no event found", http.StatusNotFound)
+		return
+	}
+
+	err = saveEvents(s.eventsPath, eventResult)
+	if err != nil {
+		http.Error(w, "failed to save events", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
 func (s *server) handleCreateEvent(w http.ResponseWriter, r *http.Request) {
 	var event Event
 	decoder := json.NewDecoder(r.Body)
