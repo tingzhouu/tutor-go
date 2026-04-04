@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
+	"sync"
 	"time"
 )
 
@@ -121,4 +123,72 @@ func (s *server) handleListEvents(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(w)
 	encoder.Encode(eventsResult)
+}
+
+func checkService(ctx context.Context, serviceName string, delay time.Duration) healthResult {
+	select {
+	case <-ctx.Done():
+		return healthResult{serviceName, "timeout"}
+	case <-time.After(delay):
+		return healthResult{serviceName, "healthy"}
+	}
+}
+
+type healthResult struct {
+	serviceName string
+	status      string
+}
+
+func (s *server) handleHealth(w http.ResponseWriter, r *http.Request) {
+	services := []struct {
+		serviceName string
+		delayMs     time.Duration
+	}{
+		{"database", 50 * time.Millisecond},
+		{"cache", 500 * time.Millisecond},
+		{"queue", 1500 * time.Millisecond},
+	}
+
+	ch := make(chan healthResult)
+
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
+	defer cancel()
+	var wg sync.WaitGroup
+
+	for _, service := range services {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			ch <- checkService(ctx, service.serviceName, service.delayMs)
+		}()
+	}
+
+	go func() {
+		wg.Wait()
+		close(ch)
+	}()
+
+	finalStatus := "healthy"
+	checks := map[string]string{}
+
+	for res := range ch {
+		if res.status != "healthy" {
+			finalStatus = "degraded"
+		}
+		checks[res.serviceName] = res.status
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(w)
+
+	finalResult := struct {
+		Checks map[string]string `json:"checks"`
+		Status string            `json:"status"`
+	}{
+		Checks: checks,
+		Status: finalStatus,
+	}
+	encoder.Encode(finalResult)
+
+	w.WriteHeader(http.StatusOK)
 }
