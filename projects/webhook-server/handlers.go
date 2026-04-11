@@ -189,6 +189,4 @@ func (s *server) handleHealth(w http.ResponseWriter, r *http.Request) {
 		Status: finalStatus,
 	}
 	encoder.Encode(finalResult)
-
-	w.WriteHeader(http.StatusOK)
 }
