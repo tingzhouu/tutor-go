@@ -3,13 +3,26 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 	"time"
 )
 
 type server struct {
 	eventsPath string
+}
+
+func (s *server) handleDelay(w http.ResponseWriter, r *http.Request) {
+	seconds := r.PathValue("seconds")
+	n, err := strconv.Atoi(seconds)
+	if err != nil || n <= 0 {
+		http.Error(w, "seconds is not a valid integer", http.StatusBadRequest)
+		return
+	}
+	time.Sleep(time.Second * time.Duration(n))
+	fmt.Fprintf(w, "slept for %d seconds\n", n)
 }
 
 func (s *server) handleUpdateEvent(w http.ResponseWriter, r *http.Request) {
