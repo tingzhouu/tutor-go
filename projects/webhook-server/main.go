@@ -7,11 +7,11 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 )
 
 func main() {
-	s := &server{eventsPath: "events.json"}
+	cfg := loadConfig()
+	s := &server{eventsPath: cfg.EventsPath}
 	http.HandleFunc("POST /events", logging(s.handleCreateEvent))
 
 	http.HandleFunc("GET /events", logging(s.handleListEvents))
@@ -24,7 +24,7 @@ func main() {
 
 	http.HandleFunc("GET /delay/{seconds}", logging(s.handleDelay))
 
-	server := &http.Server{Addr: ":8080"}
+	server := &http.Server{Addr: ":" + cfg.Port}
 
 	go func() {
 		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
@@ -37,7 +37,7 @@ func main() {
 	<-quit
 
 	logger.Info("shutting down")
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
 	defer cancel()
 	if err := server.Shutdown(ctx); err != nil {
 		logger.Error("shutdown error", "err", err)
