@@ -1,4 +1,6 @@
 # Binaries
+server
+webhook-server
 *.exe
 *.exe~
 *.dll
@@ -19,6 +21,9 @@ go.work
 .vscode/
 *.swp
 *.swo
+
+# Database
+*.db
 
 # OS
 .DS_Store
