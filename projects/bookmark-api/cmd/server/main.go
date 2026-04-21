@@ -1,0 +1,26 @@
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"tutor-go/projects/bookmark-api/internal/handler"
+	"tutor-go/projects/bookmark-api/internal/store"
+)
+
+func main() {
+	s, err := store.New("bookmarks.db")
+	if err != nil {
+		fmt.Printf("error loading store %v\n", err)
+		return
+	}
+	h := handler.Handler{Store: s}
+
+	http.HandleFunc("POST /bookmarks", h.Create)
+	http.HandleFunc("GET /bookmarks", h.GetAll)
+	http.HandleFunc("GET /bookmarks/{id}", h.GetOne)
+	http.HandleFunc("DELETE /bookmarks/{id}", h.Delete)
+
+	server := http.Server{Addr: ":3000"}
+
+	server.ListenAndServe()
+}

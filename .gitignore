@@ -1,6 +1,6 @@
 # Binaries
-server
-webhook-server
+/server
+/webhook-server
 *.exe
 *.exe~
 *.dll
