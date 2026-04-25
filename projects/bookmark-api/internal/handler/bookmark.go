@@ -5,11 +5,17 @@ import (
 	"net/http"
 	"strconv"
 	"tutor-go/projects/bookmark-api/internal/model"
-	"tutor-go/projects/bookmark-api/internal/store"
 )
 
 type Handler struct {
-	Store *store.Store
+	Store BookmarkStore
+}
+
+type BookmarkStore interface {
+	Create(b model.Bookmark) (model.Bookmark, error)
+	GetAll() ([]model.Bookmark, error)
+	GetOne(id int) (model.Bookmark, error)
+	Delete(id int) error
 }
 
 func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
