@@ -9,16 +9,26 @@ import (
 )
 
 var (
-	connections map[*websocket.Conn]bool = make(map[*websocket.Conn]bool)
+	connections map[*websocket.Conn]string = make(map[*websocket.Conn]string)
 	mu          sync.Mutex
 )
 
 func addConnection(c *websocket.Conn) {
 	mu.Lock()
 	defer mu.Unlock()
-	connections[c] = true
+	connections[c] = ""
 	fmt.Printf("we have %d connections\n", len(connections))
 	fmt.Println(connections)
+}
+
+func broadcast(message string) {
+	for connection := range connections {
+		if err := connection.WriteMessage(websocket.TextMessage, []byte(message)); err != nil {
+			fmt.Println(err)
+			delete(connections, connection)
+			connection.Close()
+		}
+	}
 }
 
 func startWebsocket(w http.ResponseWriter, r *http.Request) {
@@ -36,10 +46,11 @@ func startWebsocket(w http.ResponseWriter, r *http.Request) {
 	addConnection(conn)
 
 	for {
-		messageType, p, err := conn.ReadMessage()
+		_, p, err := conn.ReadMessage()
 		if err != nil {
 			fmt.Println(err)
 			mu.Lock()
+			broadcast(connections[conn] + " has left")
 			delete(connections, conn)
 			mu.Unlock()
 			conn.Close()
@@ -47,15 +58,13 @@ func startWebsocket(w http.ResponseWriter, r *http.Request) {
 		}
 
 		mu.Lock()
-		for connection := range connections {
-			if err := connection.WriteMessage(messageType, p); err != nil {
-				fmt.Println(err)
-				delete(connections, connection)
-				connection.Close()
-			}
+		if connections[conn] == "" {
+			connections[conn] = string(p)
+			broadcast(string(p) + " has joined")
+		} else {
+			broadcast(fmt.Sprintf("[%s]: %s", connections[conn], string(p)))
 		}
 		mu.Unlock()
-
 	}
 }
 
